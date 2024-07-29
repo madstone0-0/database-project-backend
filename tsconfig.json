@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "lib": ["es2020", "DOM"],
+        "module": "commonjs",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "strict": true,
+        "target": "ES2020",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "types": ["node"]
+    },
+    "ts-node": {
+        "transpileOnly": true,
+        // "esm": true,
+        "swc": true,
+        "experimentalSpecifierResolution": "node"
+    },
+
+    "include": ["src"]
+}
