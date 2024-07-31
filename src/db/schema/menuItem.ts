@@ -36,6 +36,8 @@ export type NewMenuItem = InferInsertModel<typeof menuItem>;
 
 const allMenuItems = db.select().from(menuItem).orderBy(menuItem.menuItemId);
 
+export const getAllMenuItems = async () => await allMenuItems.execute();
+
 export const getMostOrderedItems = async () =>
     db
         .select({

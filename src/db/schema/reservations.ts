@@ -29,3 +29,30 @@ export const reservations = mysqlTable("reservations", {
 
 export type Reservation = InferSelectModel<typeof reservations>;
 export type NewReservation = InferInsertModel<typeof reservations>;
+
+const selectResevationByCustomerId = db
+    .select()
+    .from(reservations)
+    .where(eq(reservations.customerId, sql.placeholder("id")));
+
+const deleteReservationByCustomerId = db
+    .delete(reservations)
+    .where(eq(reservations.customerId, sql.placeholder("id")));
+
+export const getReservationsByCustomerId = async (id: number) =>
+    await selectResevationByCustomerId.execute({ id });
+
+export const deleteReservationsByCustomerId = async (id: number) =>
+    await deleteReservationByCustomerId.execute({ id });
+
+export const updateReservationsByCustomerId = async (
+    id: number,
+    reservation: NewReservation,
+) =>
+    await db
+        .update(reservations)
+        .set(reservation)
+        .where(eq(reservations.customerId, id));
+
+export const insertReservation = async (reservation: NewReservation) =>
+    await db.insert(reservations).values(reservation);

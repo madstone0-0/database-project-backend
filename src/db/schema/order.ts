@@ -27,7 +27,7 @@ export const order = mysqlTable("order", {
     orderTime: date("order_time")
         .notNull()
         .default(sql`CURRENT_TIME`),
-    totalAmount: decimal("total_amount", { scale: 10, precision: 2 }).notNull(),
+    totalAmount: decimal("total_amount", { scale: 10, precision: 2 }),
     status: varchar("status", { length: 20 }).notNull().default("Pending"),
 });
 
@@ -100,39 +100,11 @@ export const getAllOrderWithDetails = async () =>
 export const getCustomerOrders = async (customerId: number) =>
     selectOrderByCustomerId.execute({ id: customerId });
 
-export const insertOrder = async (
-    newOrder: NewOrder,
-    menuItemId: number,
-    quantity: number,
-) => {
-    await db.transaction(async (tx) => {
-        const ord = await tx.insert(order).values(newOrder);
-        const dets = await insertOrderDetails({
-            orderId: ord[0].insertId,
-            menuItemId,
-            quantity,
-        });
-        const menuItemInventory =
-            await getMenuInventoryItemByMenuItemId(menuItemId);
-        for (const item of menuItemInventory) {
-            const { menuItemId, inventoryId, quantityUsed } = item;
-            const inventory = (await getInventoryById(inventoryId))[0];
-            const actualQuantUsed = quantityUsed * quantity;
+export const insertOrder = async (newOrder: NewOrder) =>
+    await db.insert(order).values(newOrder);
 
-            if (inventory.quantity < actualQuantUsed) {
-                tx.rollback();
-                throw new Error("Insufficient inventory");
-            }
+export const updateOrder = async (id: number, newOrder: NewOrder) =>
+    await db.update(order).set(newOrder).where(eq(order.orderId, id));
 
-            const newInventory = {
-                ...inventory,
-                quantity: inventory.quantity - actualQuantUsed,
-            };
-            await updateInventoryById(inventoryId, newInventory);
-        }
-    });
-};
-
-export const deleteOrder = async (id: number) => {
-    await db.transaction(async (tx) => {});
-};
+export const deleteOrder = async (id: number) =>
+    await deleteOrderByOrderId.execute({ id });

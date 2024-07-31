@@ -42,3 +42,19 @@ const menuInventoryItemByMenuItemId = db
 
 export const getMenuInventoryItemByMenuItemId = async (id: number) =>
     menuInventoryItemByMenuItemId.execute({ id });
+
+export const insertMenuItemInventory = async (
+    newMenuItemInventory: NewMenuItemInventory,
+) => db.insert(menuItemInventory).values(newMenuItemInventory);
+
+export const deleteMenuItemInventory = async (id: number) =>
+    db.delete(menuItemInventory).where(eq(menuItem.menuItemId, id));
+
+export const updateMenuItemInventory = async (
+    id: number,
+    newMenuItemInventory: NewMenuItemInventory,
+) =>
+    db
+        .update(menuItemInventory)
+        .set(newMenuItemInventory)
+        .where(eq(menuItem.menuItemId, id));
