@@ -23,6 +23,7 @@ export const menuItemInventory = mysqlTable(
         inventoryId: int("inventory_id")
             .notNull()
             .references(() => inventory.inventoryId),
+        quantityUsed: int("quantity_used").notNull(),
     },
     (t) => {
         return {
@@ -33,3 +34,11 @@ export const menuItemInventory = mysqlTable(
 
 export type MenuItemInventory = InferSelectModel<typeof menuItemInventory>;
 export type NewMenuItemInventory = InferInsertModel<typeof menuItemInventory>;
+
+const menuInventoryItemByMenuItemId = db
+    .select()
+    .from(menuItemInventory)
+    .where(eq(menuItem.menuItemId, sql.placeholder("id")));
+
+export const getMenuInventoryItemByMenuItemId = async (id: number) =>
+    menuInventoryItemByMenuItemId.execute({ id });

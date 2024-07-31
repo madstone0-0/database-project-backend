@@ -6,6 +6,8 @@ import {
     varchar,
     date,
     double,
+    decimal,
+    datetime,
     serial,
 } from "drizzle-orm/mysql-core";
 import { InferSelectModel, InferInsertModel, eq, sql } from "drizzle-orm";
@@ -18,10 +20,10 @@ export const payment = mysqlTable("payment", {
         .notNull()
         .references(() => order.orderId),
     paymentMethod: varchar("payment_method", { length: 40 }).notNull(),
-    paymentTime: date("payment_time")
+    paymentTime: datetime("payment_time")
         .notNull()
-        .default(sql`current_time`),
-    amount: double("amount", { scale: 10, precision: 2 }).notNull(),
+        .default(sql`current_timestamp()`),
+    amount: decimal("amount", { scale: 10, precision: 2 }).notNull(),
     status: varchar("status", { length: 40 }).notNull(),
 });
 

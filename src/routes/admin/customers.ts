@@ -3,7 +3,7 @@ import { logger } from "../../logging";
 import { CustomRequest } from "../../types";
 import { handleServerError } from "../../utils/handleErrors";
 import CustomerService from "../../services/CustomerService";
-import { NewCustomer } from "../../db/schema/customer";
+import { NewCustomer, customer } from "../../db/schema/customer";
 
 const customers = express.Router();
 
@@ -29,6 +29,24 @@ customers.post(
             .catch((err) => res.send(500).send("Server error!"));
     },
 );
+
+customers.get("/feedback-all", (req, res) => {
+    CustomerService.GetFeedback()
+        .then(({ status, data }) => res.status(status).send(data))
+        .catch((err) => res.send(500).send("Server error!"));
+});
+
+customers.get("/large-reservations", (req, res) => {
+    CustomerService.GetLargeReservations()
+        .then(({ status, data }) => res.status(status).send(data))
+        .catch((err) => res.send(500).send("Server error!"));
+});
+
+customers.get("/birthday-reservations", (req, res) => {
+    CustomerService.GetBirthdayReservations()
+        .then(({ status, data }) => res.status(status).send(data))
+        .catch((err) => res.send(500).send("Server error!"));
+});
 
 customers.put(
     "/update",

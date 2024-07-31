@@ -12,6 +12,8 @@ let MY_PORT: number;
 
 switch (process.env.NODE_ENV) {
     case "dev":
+        // MY_USER = "root";
+        // MY_PASS = "root";
         MY_USER = "madiba";
         MY_PASS = "madiba";
         MY_HOST = "0.0.0.0";
@@ -27,4 +29,4 @@ switch (process.env.NODE_ENV) {
         break;
 }
 
-export { MY_DB, MY_PASS, MY_USER, MY_HOST, MY_PORT };
+export { MY_DB, MY_HOST, MY_PASS, MY_PORT, MY_USER };

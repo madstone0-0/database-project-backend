@@ -5,6 +5,7 @@ import { handleServerError } from "../../utils/handleErrors";
 import StaffService from "../../services/StaffService";
 import { NewStaff } from "../../db/schema/staff";
 import { prettyPrint } from "../..";
+import CustomerService from "../../services/CustomerService";
 
 const staff = express.Router();
 
@@ -56,6 +57,18 @@ staff.put(
             .catch((e) => res.status(500).send({ message: "Server error!" }));
     },
 );
+
+staff.get("/waiters-chefs", (req, res) => {
+    StaffService.GetWaitersAndChefs()
+        .then(({ status, data }) => res.status(status).send(data))
+        .catch((e) => res.status(500).send({ message: "Server error!" }));
+});
+
+staff.get("/orders-by-waiter", (req, res) => {
+    StaffService.GetOrdersByWaiter()
+        .then(({ status, data }) => res.status(status).send(data))
+        .catch((e) => res.status(500).send({ message: "Server error!" }));
+});
 
 staff.delete("/delete/:id", (req, res) => {
     const id = parseInt(req.params.id);

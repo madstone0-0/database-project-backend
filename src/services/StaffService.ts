@@ -3,10 +3,12 @@ import {
     NewStaff,
     deleteStaffById,
     getAllStaff,
+    getOrdersByWaiter,
     getStaffByFirstAndLastName,
     getStaffById,
     getStaffByPosition,
     getStaffPositions,
+    getWaitersAndChefs,
     insertStaff,
     updateStaffById,
 } from "../db/schema/staff";
@@ -113,6 +115,24 @@ class StaffService {
             return OK({ message: `Staff ${id} updated successfully` });
         } catch (err) {
             return handleServerError(err, "Error updating staff");
+        }
+    }
+
+    async GetOrdersByWaiter(): Promise<ServiceReturn> {
+        try {
+            const orders = await getOrdersByWaiter();
+            return OK({ orders });
+        } catch (err) {
+            return handleServerError(err, "Error getting orders by waiter");
+        }
+    }
+
+    async GetWaitersAndChefs(): Promise<ServiceReturn> {
+        try {
+            const staff = await getWaitersAndChefs();
+            return OK({ staff });
+        } catch (err) {
+            return handleServerError(err, "Error getting waiters and chefs");
         }
     }
 

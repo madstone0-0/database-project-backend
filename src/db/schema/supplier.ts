@@ -1,14 +1,14 @@
+import { InferInsertModel, InferSelectModel, eq, sql } from "drizzle-orm";
 import {
+    date,
+    double,
     int,
     mysqlEnum,
     mysqlTable,
+    serial,
     uniqueIndex,
     varchar,
-    date,
-    double,
-    serial,
 } from "drizzle-orm/mysql-core";
-import { InferSelectModel, InferInsertModel, eq, sql } from "drizzle-orm";
 import db from "../../db";
 
 export const supplier = mysqlTable("supplier", {
@@ -21,3 +21,31 @@ export const supplier = mysqlTable("supplier", {
 
 export type Supplier = InferSelectModel<typeof supplier>;
 export type NewSupplier = InferInsertModel<typeof supplier>;
+
+
+const allSuppliers = db.select().from(supplier).orderBy(supplier.supplierId)
+
+const supplierSelectById = db
+    .select()
+    .from(supplier)
+    .where(eq(supplier.supplierId, sql.placeholder("id")));
+
+const supplierDeleteById = db
+    .delete(supplier)
+    .where(eq(supplier.supplierId, sql.placeholder("id")));
+
+export const getAllSuppliers = async () => allSuppliers.execute();
+
+export const getSupplierById = async (id: number) =>
+    supplierSelectById.execute({ id });
+
+export const insertSupplier = async (newSupplier: NewSupplier) =>
+    db.insert(supplier).values(newSupplier);
+
+export const deleteSupplierById = async (id: number) =>
+    supplierDeleteById.execute({ id });
+
+export const updateSupplierById = async (
+    id: number,
+    newSupplier: NewSupplier,
+) => db.update(supplier).set(newSupplier).where(eq(supplier.supplierId, id));

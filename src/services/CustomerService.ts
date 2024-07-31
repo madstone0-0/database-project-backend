@@ -1,4 +1,3 @@
-import { allowedNodeEnvironmentFlags } from "process";
 import { prettyPrint } from "..";
 import { logger } from "../logging";
 import { ServiceReturn } from "../types";
@@ -8,12 +7,14 @@ import {
     NewCustomer,
     deleteCustomerById,
     getAllCustomers,
+    getBirthdayReservations,
     getCustomerByFirstAndLastName,
     getCustomerById,
+    getLargeReservations,
     insertCustomer,
     updateCustomerById,
 } from "../db/schema/customer";
-import { updateStaffById } from "../db/schema/staff";
+import { feedbackByCustomers } from "../db/schema/feedback";
 
 class CustomerService {
     async GetAll(): Promise<ServiceReturn> {
@@ -84,6 +85,36 @@ class CustomerService {
             return OK({ id });
         } catch (err) {
             return handleServerError(err, "Error adding customer");
+        }
+    }
+
+    async GetFeedback(): Promise<ServiceReturn> {
+        try {
+            const feedback = await feedbackByCustomers();
+            return OK({ feedback });
+        } catch (err) {
+            return handleServerError(err, "Error getting feedback");
+        }
+    }
+
+    async GetBirthdayReservations(): Promise<ServiceReturn> {
+        try {
+            const birthdayReservations = await getBirthdayReservations();
+            return OK({ birthdayReservations });
+        } catch (err) {
+            return handleServerError(
+                err,
+                "Error getting birthday reservations",
+            );
+        }
+    }
+
+    async GetLargeReservations(): Promise<ServiceReturn> {
+        try {
+            const largeReservations = await getLargeReservations();
+            return OK({ largeReservations });
+        } catch (err) {
+            return handleServerError(err, "Error getting large reservations");
         }
     }
 

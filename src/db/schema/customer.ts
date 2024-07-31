@@ -1,6 +1,15 @@
 import { mysqlTable, varchar, serial } from "drizzle-orm/mysql-core";
-import { InferSelectModel, InferInsertModel, eq, sql, and } from "drizzle-orm";
+import {
+    InferSelectModel,
+    gte,
+    InferInsertModel,
+    eq,
+    sql,
+    and,
+} from "drizzle-orm";
 import db from "../../db";
+import { reservations } from "./reservations";
+import { table } from "./table";
 
 export const customer = mysqlTable("customer", {
     customerId: serial("customer_id").primaryKey(),
@@ -55,3 +64,34 @@ export const getCustomerByFirstAndLastName = async (
     first: string,
     last: string,
 ) => customerSelectByFirstAndLastName.execute({ first, last });
+
+export const getLargeReservations = async () =>
+    db
+        .select({
+            customerId: customer.customerId,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            seatingCapacity: table.seatingCapacity,
+        })
+        .from(customer)
+        .innerJoin(
+            reservations,
+            eq(customer.customerId, reservations.customerId),
+        )
+        .innerJoin(table, eq(reservations.tableId, table.tableId))
+        .where(gte(table.seatingCapacity, 4));
+
+export const getBirthdayReservations = async () =>
+    db
+        .select({
+            customerId: customer.customerId,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            specialRequests: reservations.specialRequests,
+        })
+        .from(customer)
+        .innerJoin(
+            reservations,
+            eq(customer.customerId, reservations.customerId),
+        )
+        .where(sql`lower(${reservations.specialRequests}) like "%birthday%"`);

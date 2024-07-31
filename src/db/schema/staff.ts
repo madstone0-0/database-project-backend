@@ -5,11 +5,21 @@ import {
     uniqueIndex,
     varchar,
     date,
-    double,
+    decimal,
     serial,
 } from "drizzle-orm/mysql-core";
-import { InferSelectModel, InferInsertModel, eq, sql, and } from "drizzle-orm";
+import {
+    InferSelectModel,
+    or,
+    InferInsertModel,
+    eq,
+    sql,
+    and,
+    isNull,
+    count,
+} from "drizzle-orm";
 import db from "../../db";
+import { order } from "./order";
 
 export const staff = mysqlTable("staff", {
     staffId: serial("staff_id").primaryKey(),
@@ -22,7 +32,7 @@ export const staff = mysqlTable("staff", {
     hireDate: date("hire_date")
         .notNull()
         .default(sql`CURRENT_DATE()`),
-    salary: double("salary", { scale: 10, precision: 4 }).notNull(),
+    salary: decimal("salary", { scale: 10, precision: 4 }).notNull(),
 });
 
 export type Staff = InferSelectModel<typeof staff>;
@@ -69,17 +79,51 @@ export const getStaffByPosition = async (position: string) =>
     staffSelectByPosition.execute({ position });
 
 export const insertStaff = async (newStaff: NewStaff) =>
-    db.insert(staff).values(newStaff);
+    await db.insert(staff).values(newStaff);
 
 export const deleteStaffById = async (id: number) =>
     staffDeleteById.execute({ id });
 
 export const updateStaffById = async (id: number, newStaff: NewStaff) =>
-    db.update(staff).set(newStaff).where(eq(staff.staffId, id));
+    await db.update(staff).set(newStaff).where(eq(staff.staffId, id));
 
 export const getStaffPositions = async () => positions.execute();
 
 export const getStaffByFirstAndLastName = async (first: string, last: string) =>
     staffSelectByFirstAndLastName.execute({ first, last });
 
-// export const getWaitersAndChefs = async() => db.select().from()
+export const getWaitersAndChefs = async () =>
+    await db
+        .select({
+            staffId: staff.staffId,
+            firstName: staff.firstName,
+            lastName: staff.lastName,
+            position: staff.position,
+            hireDate: staff.hireDate,
+        })
+        .from(staff)
+        .where(
+            or(
+                sql`lower(${staff.position}) = lower("waiter")`,
+                sql`lower(${staff.position}) = lower("chef")`,
+            ),
+        )
+        .orderBy(staff.hireDate);
+
+export const getOrdersByWaiter = async () =>
+    await db
+        .select({
+            staffId: staff.staffId,
+            firstName: staff.firstName,
+            lastName: staff.lastName,
+            totalOrders: count(order.orderId),
+        })
+        .from(staff)
+        .innerJoin(order, eq(staff.staffId, order.staffId))
+        .where(
+            and(
+                sql`${order.orderId} IS NOT NULL`,
+                sql`lower(${staff.position}) = lower("waiter")`,
+            ),
+        )
+        .groupBy(staff.staffId, staff.firstName, staff.lastName);

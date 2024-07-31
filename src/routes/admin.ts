@@ -2,8 +2,10 @@ import express from "express";
 import { logger } from "../logging";
 import { CustomRequest } from "../types";
 import { handleServerError } from "../utils/handleErrors";
-import staff from "./admin/staff";
+import carpark from "./admin/carpark";
 import customers from "./admin/customers";
+import restock from "./admin/restock";
+import staff from "./admin/staff";
 
 const admin = express.Router();
 
@@ -24,5 +26,7 @@ admin.post(
 
 admin.use("/staff", staff);
 admin.use("/customers", customers);
+admin.use("/carpark", carpark)
+admin.use("/restock", restock)
 
 export default admin;

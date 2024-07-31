@@ -26,3 +26,6 @@ export const orderDetails = mysqlTable("order_details", {
 
 export type OrderDetails = InferSelectModel<typeof orderDetails>;
 export type NewOrderDetails = InferInsertModel<typeof orderDetails>;
+
+export const insertOrderDetails = async (newOrderDetails: NewOrderDetails) =>
+    await db.insert(orderDetails).values(newOrderDetails);
